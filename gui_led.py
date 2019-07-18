@@ -31,14 +31,21 @@ strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, 
 strip.begin()
     
 # Define functions which animate LEDs in various ways.
-def colorWipe(strip, color, wait_ms=50, shine):
+def colorWipe(strip, color, wait_ms=50):
     """Wipe color across display a pixel at a time."""
+    changeBrightness()
     for i in range(strip.numPixels()):
         strip.setBrightness(shine)
         strip.setPixelColor(i, color)
         strip.show()
         time.sleep(wait_ms/1000.0)
-        
+
+def changeBrightness():
+    global shine
+    shine = int(var.get())
+    strip.setBrightness(shine)
+    strip.show()
+    
 # Get colour using tkinter color chooser
 def getColor():
     global r, g, b
@@ -48,8 +55,7 @@ def getColor():
         g = grb[0]
         r = grb[1]
         b = grb[2]
-        shine = int(var.get())
-        colorWipe(strip, Color(r, g, b), shine)
+        colorWipe(strip, Color(r, g, b))
 
 # Power off leds
 def offLeds():
@@ -76,6 +82,7 @@ def stopAnimation():
 
 def theaterChase(strip, color, wait_ms=50, iterations=10):
     """Movie theater light style chaser animation."""
+    changeBrightness()
     for j in range(iterations):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
@@ -98,6 +105,7 @@ def wheel(pos):
 
 def rainbow(strip, wait_ms=20, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
+    changeBrightness()
     for j in range(256*iterations):
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, wheel((i+j) & 255))
@@ -105,10 +113,10 @@ def rainbow(strip, wait_ms=20, iterations=1):
         time.sleep(wait_ms/1000.0)
 
 def rainbowCycle(strip, wait_ms=20, iterations=1):
-    """Draw rainbow that uniformly distributes itself across all pixels."""
-        
+    """Draw rainbow that uniformly distributes itself across all pixels."""   
     global flag_animation_run
     global flag_animation_stop
+    changeBrightness()
     while(True):
         if (flag_animation_run == True):
             for j in range(256*iterations):
@@ -123,6 +131,7 @@ def rainbowCycle(strip, wait_ms=20, iterations=1):
 
 def theaterChaseRainbow(strip, wait_ms=50):
     """Rainbow movie theater light style chaser animation."""
+    changeBrightness()
     for j in range(256):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
@@ -135,7 +144,7 @@ def theaterChaseRainbow(strip, wait_ms=50):
 if __name__ == '__main__':
     window = Tk()
     window.title("LED WS2812 options")
-    window.geometry('540x140')
+    window.geometry('500x140')
     window.resizable(width=False, height=False)
     
     lblColour = Label(window, text="Wybierz kolor podświetlenia: ")
@@ -153,7 +162,9 @@ if __name__ == '__main__':
     var = DoubleVar()
     lblBrightness = Label(window, text="Ustaw intensywność podświetlenia: ")
     lblBrightness.grid(column=0, row=2, sticky='w')
-    scale = Scale(window, variable=var, orient=HORIZONTAL, from_=0, to=128)
+    btnBrightness = Button(window, text="Ustaw", command=changeBrightness)
+    btnBrightness.grid(column=1, row=2, sticky='we')
+    scale = Scale(window, variable=var, orient=HORIZONTAL, from_=0, to=255)
     scale.grid(column=2, row=2, sticky='we')
     scale.set(128)
     
