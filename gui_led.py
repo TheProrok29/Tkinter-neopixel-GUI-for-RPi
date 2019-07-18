@@ -43,7 +43,6 @@ def getColor():
     global r, g, b
     color = askcolor(color=(g, r, b)) 
     grb = color[0]
-    print(grb)
     if grb != None:
         g = grb[0]
         r = grb[1]
@@ -135,24 +134,25 @@ def theaterChaseRainbow(strip, wait_ms=50):
 if __name__ == '__main__':
     window = Tk()
     window.title("LED WS2812 options")
-    window.geometry('400x300')
+    window.geometry('440x100')
+    window.resizable(width=False, height=False)
     
-    lblColour = Label(window, text="Wybierz kolor podświetlenia")
+    lblColour = Label(window, text="Wybierz kolor podświetlenia: ")
     lblColour.grid(column=0, row=0)
-    btnColour = Button(window, text="Paleta kolorów", command=getColor)
-    btnColour.grid(column=1, row=0)
+    btnColour = Button(window, text="Paleta kolorów:", command=getColor)
+    btnColour.grid(column=2, row=0, sticky='e')
     
     lblRainbow = Label(window, text="Efekt tęczy")
-    lblRainbow.grid(column=0, row=1)
-    btnRainbowOn = Button(window, text="Włącz", command=startRainbow)
-    btnRainbowOn.grid(column=1, row=1)
+    lblRainbow.grid(column=0, row=1, sticky='w')
+    btnRainbowOn = Button(window, text="     Włącz     ", command=startRainbow)
+    btnRainbowOn.grid(column=1, row=1, sticky='we')
     btnRainbowOff = Button(window, text="Wyłącz", command=stopAnimation)
-    btnRainbowOff.grid(column=2, row=1)
+    btnRainbowOff.grid(column=2, row=1, sticky='we')
     
-    lbl = Label(window, text="Kliknij jeśli chcesz wyłączyć")
+    lbl = Label(window, text="Kliknij jeśli chcesz wyłączyć: ")
     lbl.grid(column=0, row=4)
     btn = Button(window, text="Wyłacz LED", command=offLeds)
-    btn.grid(column=1, row=4)
+    btn.grid(column=2, row=4, sticky='we')
     
     window.mainloop()
  
