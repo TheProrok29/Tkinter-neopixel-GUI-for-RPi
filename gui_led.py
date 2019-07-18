@@ -31,9 +31,10 @@ strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, 
 strip.begin()
     
 # Define functions which animate LEDs in various ways.
-def colorWipe(strip, color, wait_ms=50):
+def colorWipe(strip, color, wait_ms=50, shine):
     """Wipe color across display a pixel at a time."""
     for i in range(strip.numPixels()):
+        strip.setBrightness(shine)
         strip.setPixelColor(i, color)
         strip.show()
         time.sleep(wait_ms/1000.0)
@@ -47,7 +48,8 @@ def getColor():
         g = grb[0]
         r = grb[1]
         b = grb[2]
-        colorWipe(strip, Color(r, g, b))
+        shine = int(var.get())
+        colorWipe(strip, Color(r, g, b), shine)
 
 # Power off leds
 def offLeds():
@@ -129,16 +131,15 @@ def theaterChaseRainbow(strip, wait_ms=50):
             time.sleep(wait_ms/1000.0)
             for i in range(0, strip.numPixels(), 3):
                 strip.setPixelColor(i+q, 0)
-
                 
 if __name__ == '__main__':
     window = Tk()
     window.title("LED WS2812 options")
-    window.geometry('440x100')
+    window.geometry('540x140')
     window.resizable(width=False, height=False)
     
     lblColour = Label(window, text="Wybierz kolor podświetlenia: ")
-    lblColour.grid(column=0, row=0)
+    lblColour.grid(column=0, row=0, sticky='w')
     btnColour = Button(window, text="Paleta kolorów:", command=getColor)
     btnColour.grid(column=2, row=0, sticky='e')
     
@@ -149,10 +150,17 @@ if __name__ == '__main__':
     btnRainbowOff = Button(window, text="Wyłącz", command=stopAnimation)
     btnRainbowOff.grid(column=2, row=1, sticky='we')
     
-    lbl = Label(window, text="Kliknij jeśli chcesz wyłączyć: ")
-    lbl.grid(column=0, row=4)
-    btn = Button(window, text="Wyłacz LED", command=offLeds)
-    btn.grid(column=2, row=4, sticky='we')
+    var = DoubleVar()
+    lblBrightness = Label(window, text="Ustaw intensywność podświetlenia: ")
+    lblBrightness.grid(column=0, row=2, sticky='w')
+    scale = Scale(window, variable=var, orient=HORIZONTAL, from_=0, to=128)
+    scale.grid(column=2, row=2, sticky='we')
+    scale.set(128)
+    
+    lblOff = Label(window, text="Kliknij jeśli chcesz wyłączyć: ")
+    lblOff.grid(column=0, row=3, sticky='w')
+    btnOff = Button(window, text="Wyłacz LED", command=offLeds)
+    btnOff.grid(column=2, row=3, sticky='we')
     
     window.mainloop()
  
