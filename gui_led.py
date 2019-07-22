@@ -37,7 +37,7 @@ class GraphicalUserInterface:
     def __init__(self, master):
         self.master = master
         master.title('LED WS2812 options')
-        master.geometry('500x140')
+        master.geometry('500x180')
         master.resizable(width=False, height=False)
         
         # Widgets
@@ -46,12 +46,15 @@ class GraphicalUserInterface:
         self.labelRainbow = Label(master, text="Efekt tęczy")
         self.labelBrightness = Label(master, text="Ustaw intensywność podświetlenia: ")
         self.labelOff = Label(master, text="Kliknij jeśli chcesz wyłączyć: ")
-
+        self.labelRainbowAll = Label(master, text="Efekt tęczy prosty")
+        
         self.btnColor = Button(master, text="Paleta kolorów:", command=self.getColor)
         self.btnRainbowOn = Button(master, text="     Włącz     ", command=self.startRainbow)
         self.btnRainbowOff = Button(master, text="Wyłącz", command=self.stopAnimation)
         self.btnBrightness = Button(master, text="Ustaw", command=self.changeBrightness)
         self.btnOff = Button(master, text="Wyłacz LED", command=self.offLeds)
+        self.btnRainbowAllOn = Button(master, text="    Włącz    ", command=self.startRainbowAll)
+        self.btnRainbowOff2 = Button(master, text="Wyłącz", command=self.stopAnimation)
         
         self.scale = Scale(master, orient=HORIZONTAL, from_=0, to=255)
         self.scale.set(128)
@@ -61,19 +64,21 @@ class GraphicalUserInterface:
         self.labelRainbow.grid(column=0, row=1, sticky='w')
         self.labelBrightness.grid(column=0, row=2, sticky='w')
         self.labelOff.grid(column=0, row=3, sticky='w')
+        self.labelRainbowAll.grid(column=0, row=4, sticky='w')
 
         self.btnColor.grid(column=2, row=0, sticky='e')
         self.btnRainbowOn.grid(column=1, row=1, sticky='we')
         self.btnRainbowOff.grid(column=2, row=1, sticky='we')
         self.btnBrightness.grid(column=1, row=2, sticky='we')
         self.btnOff.grid(column=2, row=3, sticky='we')
-
+        self.btnRainbowAllOn.grid(column=1, row=4, sticky='we')
+        self.btnRainbowOff2.grid(column=2, row=4, sticky='we')
+        
         self.scale.grid(column=2, row=2, sticky='we')
     
     def changeBrightness(self):
         global shine
         shine = self.scale.get()
-        print('Shine: ', str(shine))
         strip.setBrightness(shine)
         strip.show()
 
@@ -94,7 +99,14 @@ class GraphicalUserInterface:
 
     # Run rainbow animation on separate thread
     def startRainbow(self):
+        self.stopAnimation()
         thread = threading.Thread(target=self.onRainbow)
+        thread.start()
+    
+    # Run rainbow animation on separate thread
+    def startRainbowAll(self):
+        self.stopAnimation()
+        thread = threading.Thread(target=self.onRainbowAll)
         thread.start()
     
     # Set flags to run animation
@@ -103,8 +115,16 @@ class GraphicalUserInterface:
         global flag_animation_run
         flag_animation_stop = False
         flag_animation_run = True
-        #rainbow(strip)
         rainbowCycle(strip)
+    
+    # Set flags to run animation
+    def onRainbowAll(self):
+        global flag_animation_stop
+        global flag_animation_run
+        flag_animation_stop = False
+        flag_animation_run = True
+        rainbow(strip)
+        
     
     # Set flags to stop animation
     def stopAnimation(self):
@@ -145,15 +165,21 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
         
-def rainbow(strip, wait_ms=20, iterations=1):
+def rainbow(strip, wait_ms=50, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
+    global flag_animation_run
+    global flag_animation_stop
     my_gui.changeBrightness()
-    for j in range(256 * iterations):
-        for i in range(strip.numPixels()):
-            strip.setPixelColor(i, wheel((i + j) & 255))
-        strip.show()
-        time.sleep(wait_ms / 1000.0)
-
+    while (True):
+        if (flag_animation_run == True):
+            for j in range(256 * iterations):
+                for i in range(strip.numPixels()):
+                    strip.setPixelColor(i, wheel((i + j) & 255))
+                strip.show()
+                time.sleep(wait_ms / 1000.0)
+        if (flag_animation_stop == True):
+            colorWipe(strip, Color(0, 0, 0))
+            return
 
 def rainbowCycle(strip, wait_ms=20, iterations=1):
     """Draw rainbow that uniformly distributes itself across all pixels."""
