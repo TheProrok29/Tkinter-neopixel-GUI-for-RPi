@@ -99,37 +99,28 @@ class GraphicalUserInterface:
 
     # Run rainbow animation on separate thread
     def startRainbow(self):
-        self.stopAnimation()
-        thread = threading.Thread(target=self.onRainbow)
+        global flag_animation_stop
+        global flag_animation_run
+        flag_animation_stop = False
+        flag_animation_run = True
+        thread = threading.Thread(target=rainbowCycle, args=(strip,))
         thread.start()
     
     # Run rainbow animation on separate thread
     def startRainbowAll(self):
-        self.stopAnimation()
-        thread = threading.Thread(target=self.onRainbowAll)
+        global flag_animation_stop
+        global flag_animation_run
+        flag_animation_stop = False
+        flag_animation_run = True
+        thread = threading.Thread(target=rainbow, args=(strip,))
         thread.start()
-    
-    # Set flags to run animation
-    def onRainbow(self):
-        global flag_animation_stop
-        global flag_animation_run
-        flag_animation_stop = False
-        flag_animation_run = True
-        rainbowCycle(strip)
-    
-    # Set flags to run animation
-    def onRainbowAll(self):
-        global flag_animation_stop
-        global flag_animation_run
-        flag_animation_stop = False
-        flag_animation_run = True
-        rainbow(strip)
-        
     
     # Set flags to stop animation
     def stopAnimation(self):
+        global flag_animation_run
         global flag_animation_stop
         flag_animation_stop = True
+        flag_animation_run = False
 
 
     # Define functions which animate LEDs in various ways.
@@ -171,15 +162,16 @@ def rainbow(strip, wait_ms=50, iterations=1):
     global flag_animation_stop
     my_gui.changeBrightness()
     while (True):
+        if (flag_animation_stop == True):
+            colorWipe(strip, Color(0, 0, 0))
+            return
         if (flag_animation_run == True):
             for j in range(256 * iterations):
                 for i in range(strip.numPixels()):
                     strip.setPixelColor(i, wheel((i + j) & 255))
                 strip.show()
                 time.sleep(wait_ms / 1000.0)
-        if (flag_animation_stop == True):
-            colorWipe(strip, Color(0, 0, 0))
-            return
+        
 
 def rainbowCycle(strip, wait_ms=20, iterations=1):
     """Draw rainbow that uniformly distributes itself across all pixels."""
@@ -187,15 +179,16 @@ def rainbowCycle(strip, wait_ms=20, iterations=1):
     global flag_animation_stop
     my_gui.changeBrightness()
     while (True):
+        if (flag_animation_stop == True):
+            colorWipe(strip, Color(0, 0, 0))
+            return
         if (flag_animation_run == True):
             for j in range(256 * iterations):
                 for i in range(strip.numPixels()):
                     strip.setPixelColor(i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
                 strip.show()
                 time.sleep(wait_ms / 1000.0)
-        if (flag_animation_stop == True):
-            colorWipe(strip, Color(0, 0, 0))
-            return
+       
             
             
 def theaterChaseRainbow(strip, wait_ms=50):
