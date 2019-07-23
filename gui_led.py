@@ -48,13 +48,13 @@ class GraphicalUserInterface:
         self.labelOff = Label(master, text="Kliknij jeśli chcesz wyłączyć: ")
         self.labelRainbowAll = Label(master, text="Efekt tęczy prosty")
         
-        self.btnColor = Button(master, text="Paleta kolorów:", command=self.getColor)
-        self.btnRainbowOn = Button(master, text="     Włącz     ", command=self.startRainbow)
-        self.btnRainbowOff = Button(master, text="Wyłącz", command=self.stopAnimation)
-        self.btnBrightness = Button(master, text="Ustaw", command=self.changeBrightness)
-        self.btnOff = Button(master, text="Wyłacz LED", command=self.offLeds)
-        self.btnRainbowAllOn = Button(master, text="    Włącz    ", command=self.startRainbowAll)
-        self.btnRainbowOff2 = Button(master, text="Wyłącz", command=self.stopAnimation)
+        self.btnColor = Button(master, text="Paleta kolorów:", command=self.get_color)
+        self.btnRainbowOn = Button(master, text="     Włącz     ", command=self.start_rainbow)
+        self.btnRainbowOff = Button(master, text="Wyłącz", command=self.stop_animation)
+        self.btnBrightness = Button(master, text="Ustaw", command=self.changeB_brightness)
+        self.btnOff = Button(master, text="Wyłacz LED", command=self.off_leds)
+        self.btnRainbowAllOn = Button(master, text="    Włącz    ", command=self.start_rainbow_all)
+        self.btnRainbowOff2 = Button(master, text="Wyłącz", command=self.stop_animation)
         
         self.scale = Scale(master, orient=HORIZONTAL, from_=0, to=255)
         self.scale.set(128)
@@ -76,14 +76,14 @@ class GraphicalUserInterface:
         
         self.scale.grid(column=2, row=2, sticky='we')
     
-    def changeBrightness(self):
+    def change_brightness(self):
         global shine
         shine = self.scale.get()
         strip.setBrightness(shine)
         strip.show()
 
     # Get colour using tkinter color chooser
-    def getColor(self):
+    def get_color(self):
         global r, g, b
         color = askcolor(color=(g, r, b))
         grb = color[0]
@@ -94,34 +94,34 @@ class GraphicalUserInterface:
             colorWipe(strip, Color(r, g, b))
 
     # Power off leds
-    def offLeds(self):
+    def off_leds(self):
         colorWipe(strip, Color(0, 0, 0))
 
     # Run rainbow animation on separate thread
-    def startRainbow(self):
-        global flag_animation_stop
-        global flag_animation_run
-        flag_animation_stop = False
-        flag_animation_run = True
+    def start_rainbow(self):
+        self.start_animation()
         thread = threading.Thread(target=rainbowCycle, args=(strip,))
         thread.start()
     
     # Run rainbow animation on separate thread
-    def startRainbowAll(self):
-        global flag_animation_stop
-        global flag_animation_run
-        flag_animation_stop = False
-        flag_animation_run = True
+    def start_rainbow_all(self):
+        self.start_animation()
         thread = threading.Thread(target=rainbow, args=(strip,))
         thread.start()
     
     # Set flags to stop animation
-    def stopAnimation(self):
+    def stop_animation(self):
         global flag_animation_run
         global flag_animation_stop
         flag_animation_stop = True
         flag_animation_run = False
-
+    
+    # Set flags to start animation
+    def start_animation(self):
+        global flag_animation_stop
+        global flag_animation_run
+        flag_animation_stop = False
+        flag_animation_run = True
 
     # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
