@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import time
-from neopixel import *
-
+from neopixel import Adafruit_NeoPixel
+from neopixel import Color
+from animations import Animation
 
 from Tkinter import *
 from tkColorChooser import askcolor
@@ -33,9 +33,6 @@ class GraphicalUserInterface:
         master.title('LED WS2812 options')
         master.geometry('500x180')
         master.resizable(width=False, height=False)
-        
-        self.flag_animation_run = False  # Global flag- animation run
-        self.flag_animation_stop = False  # Global flag  animation stop
 #
         self.r = 0;  # Red colour
         self.g = 0;  # Green colour
@@ -52,11 +49,11 @@ class GraphicalUserInterface:
         
         self.btnColor = Button(master, text="Paleta kolorów:", command=self.get_color)
         self.btnRainbowOn = Button(master, text="     Włącz     ", command=self.start_rainbow)
-        self.btnRainbowOff = Button(master, text="Wyłącz", command=self.stop_animation)
+        self.btnRainbowOff = Button(master, text="Wyłącz", command=Animation.stop_animation)
         self.btnBrightness = Button(master, text="Ustaw", command=self.change_brightness)
         self.btnOff = Button(master, text="Wyłacz LED", command=self.off_leds)
         self.btnRainbowAllOn = Button(master, text="    Włącz    ", command=self.start_rainbow_all)
-        self.btnRainbowOff2 = Button(master, text="Wyłącz", command=self.stop_animation)
+        self.btnRainbowOff2 = Button(master, text="Wyłącz", command=Animation.stop_animation)
         
         self.scale = Scale(master, orient=HORIZONTAL, from_=0, to=255)
         self.scale.set(128)
@@ -92,119 +89,26 @@ class GraphicalUserInterface:
             self.g = grb[0]
             self.r = grb[1]
             self.b = grb[2]
-            colorWipe(strip, Color(self.r, self.g, self.b), self.shine)
+            Animation.colorWipe(strip, Color(self.r, self.g, self.b), self.shine)
 
     # Power off leds
     def off_leds(self):
-        colorWipe(strip, Color(0, 0, 0))
+        Animation.colorWipe(strip, Color(0, 0, 0))
         print("Wyłączenie ledów")
 
     # Run rainbow animation on separate thread
     def start_rainbow(self):
-        self.start_animation()
-        thread = threading.Thread(target=rainbowCycle, args=(strip,))
+        Animation.start_animation()
+        thread = threading.Thread(target=Animation.rainbowCycle, args=(strip,))
         thread.start()
     
     # Run rainbow animation on separate thread
     def start_rainbow_all(self):
-        self.start_animation()
-        thread = threading.Thread(target=rainbow, args=(strip,))
+        Animation.start_animation()
+        thread = threading.Thread(target=Animation.rainbow, args=(strip,))
         thread.start()
-    
-    # Set flags to stop animation
-    def stop_animation(self):
-        global flag_animation_run
-        global flag_animation_stop
-        flag_animation_stop = True
-        flag_animation_run = False
-    
-    # Set flags to start animation
-    def start_animation(self):
-        global flag_animation_stop
-        global flag_animation_run
-        flag_animation_stop = False
-        flag_animation_run = True
 
-    # Define functions which animate LEDs in various ways.
-def colorWipe(strip, color, wait_ms=50):
-    """Wipe color across display a pixel at a time."""
-    for i in range(strip.numPixels()):
-        print("Czyszczenie paska")
-        strip.setPixelColor(i, color)
-        strip.show()
-        time.sleep(wait_ms / 1000.0)
-        
-def theaterChase(strip, color, wait_ms=50, iterations=10):
-        """Movie theater light style chaser animation."""
-     #   my_gui.changeBrightness()
-        for j in range(iterations):
-            for q in range(3):
-                for i in range(0, strip.numPixels(), 3):
-                    strip.setPixelColor(i + q, color)
-                strip.show()
-                time.sleep(wait_ms / 1000.0)
-                for i in range(0, strip.numPixels(), 3):
-                    strip.setPixelColor(i + q, 0)
 
-def wheel(pos):
-    """Generate rainbow colors across 0-255 positions."""
-    if pos < 85:
-        return Color(pos * 3, 255 - pos * 3, 0)
-    elif pos < 170:
-        pos -= 85
-        return Color(255 - pos * 3, 0, pos * 3)
-    else:
-        pos -= 170
-        return Color(0, pos * 3, 255 - pos * 3)
-        
-def rainbow(strip, wait_ms=50, iterations=1):
-    """Draw rainbow that fades across all pixels at once."""
-    global flag_animation_run
-    global flag_animation_stop
-    #my_gui.changeBrightness()
-    while (True):
-        if (flag_animation_stop == True):
-            colorWipe(strip, Color(0, 0, 0))
-            return
-        if (flag_animation_run == True):
-            for j in range(256 * iterations):
-                for i in range(strip.numPixels()):
-                    print("Animacja prostej tęnczy")
-                    strip.setPixelColor(i, wheel((i + j) & 255))
-                strip.show()
-                time.sleep(wait_ms / 1000.0)
-        
-
-def rainbowCycle(strip, wait_ms=20, iterations=1):
-    """Draw rainbow that uniformly distributes itself across all pixels."""
-    global flag_animation_run
-    global flag_animation_stop
-    #my_gui.changeBrightness()
-    while (True):
-        if (flag_animation_stop == True):
-            colorWipe(strip, Color(0, 0, 0))
-            return
-        if (flag_animation_run == True):
-            for j in range(256 * iterations):
-                for i in range(strip.numPixels()):
-                    print("Animacja tęnczy")
-                    strip.setPixelColor(i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
-                strip.show()
-                time.sleep(wait_ms / 1000.0)
-       
-            
-            
-def theaterChaseRainbow(strip, wait_ms=50):
-    """Rainbow movie theater light style chaser animation."""
-    #my_gui.changeBrightness()
-    for j in range(256):
-        for q in range(3):
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i + q, wheel((i + j) % 255))
-            strip.show()
-            time.sleep(wait_ms / 1000.0)
-            for i in range(0, strip.numPixels(), 3):
-                strip.setPixelColor(i + q, 0)
 
 if __name__ == '__main__':
 
