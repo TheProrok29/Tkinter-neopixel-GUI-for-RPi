@@ -24,13 +24,7 @@ strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, 
 # Intialize the library (must be called once before other functions).
 strip.begin()
 
-flag_animation_run = False  # Global flag- animation run
-flag_animation_stop = False  # Global flag  animation stop
-#
-r = 0;  # Red colour
-g = 0;  # Green colour
-b = 0;  # Blue colour
-shine = 0
+
 
 class GraphicalUserInterface:    
     
@@ -40,6 +34,14 @@ class GraphicalUserInterface:
         master.geometry('500x180')
         master.resizable(width=False, height=False)
         
+        self.flag_animation_run = False  # Global flag- animation run
+        self.flag_animation_stop = False  # Global flag  animation stop
+#
+        self.r = 0;  # Red colour
+        self.g = 0;  # Green colour
+        self.b = 0;  # Blue colour
+        self.shine = 0
+
         # Widgets
 
         self.labelColor = Label(master, text="Wybierz kolor podświetlenia: ")
@@ -51,7 +53,7 @@ class GraphicalUserInterface:
         self.btnColor = Button(master, text="Paleta kolorów:", command=self.get_color)
         self.btnRainbowOn = Button(master, text="     Włącz     ", command=self.start_rainbow)
         self.btnRainbowOff = Button(master, text="Wyłącz", command=self.stop_animation)
-        self.btnBrightness = Button(master, text="Ustaw", command=self.changeB_brightness)
+        self.btnBrightness = Button(master, text="Ustaw", command=self.change_brightness)
         self.btnOff = Button(master, text="Wyłacz LED", command=self.off_leds)
         self.btnRainbowAllOn = Button(master, text="    Włącz    ", command=self.start_rainbow_all)
         self.btnRainbowOff2 = Button(master, text="Wyłącz", command=self.stop_animation)
@@ -77,25 +79,25 @@ class GraphicalUserInterface:
         self.scale.grid(column=2, row=2, sticky='we')
     
     def change_brightness(self):
-        global shine
-        shine = self.scale.get()
-        strip.setBrightness(shine)
+        self.shine = self.scale.get()
+        strip.setBrightness(self.shine)
         strip.show()
+        print("Ustawienie podświetlenia")
 
     # Get colour using tkinter color chooser
     def get_color(self):
-        global r, g, b
-        color = askcolor(color=(g, r, b))
+        color = askcolor(color=(self.g, self.r, self.b))
         grb = color[0]
         if grb != None:
-            g = grb[0]
-            r = grb[1]
-            b = grb[2]
-            colorWipe(strip, Color(r, g, b))
+            self.g = grb[0]
+            self.r = grb[1]
+            self.b = grb[2]
+            colorWipe(strip, Color(self.r, self.g, self.b), self.shine)
 
     # Power off leds
     def off_leds(self):
         colorWipe(strip, Color(0, 0, 0))
+        print("Wyłączenie ledów")
 
     # Run rainbow animation on separate thread
     def start_rainbow(self):
@@ -126,16 +128,15 @@ class GraphicalUserInterface:
     # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=50):
     """Wipe color across display a pixel at a time."""
-    my_gui.changeBrightness()
     for i in range(strip.numPixels()):
-        strip.setBrightness(shine)
+        print("Czyszczenie paska")
         strip.setPixelColor(i, color)
         strip.show()
         time.sleep(wait_ms / 1000.0)
         
 def theaterChase(strip, color, wait_ms=50, iterations=10):
         """Movie theater light style chaser animation."""
-        my_gui.changeBrightness()
+     #   my_gui.changeBrightness()
         for j in range(iterations):
             for q in range(3):
                 for i in range(0, strip.numPixels(), 3):
@@ -160,7 +161,7 @@ def rainbow(strip, wait_ms=50, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
     global flag_animation_run
     global flag_animation_stop
-    my_gui.changeBrightness()
+    #my_gui.changeBrightness()
     while (True):
         if (flag_animation_stop == True):
             colorWipe(strip, Color(0, 0, 0))
@@ -168,6 +169,7 @@ def rainbow(strip, wait_ms=50, iterations=1):
         if (flag_animation_run == True):
             for j in range(256 * iterations):
                 for i in range(strip.numPixels()):
+                    print("Animacja prostej tęnczy")
                     strip.setPixelColor(i, wheel((i + j) & 255))
                 strip.show()
                 time.sleep(wait_ms / 1000.0)
@@ -177,7 +179,7 @@ def rainbowCycle(strip, wait_ms=20, iterations=1):
     """Draw rainbow that uniformly distributes itself across all pixels."""
     global flag_animation_run
     global flag_animation_stop
-    my_gui.changeBrightness()
+    #my_gui.changeBrightness()
     while (True):
         if (flag_animation_stop == True):
             colorWipe(strip, Color(0, 0, 0))
@@ -185,6 +187,7 @@ def rainbowCycle(strip, wait_ms=20, iterations=1):
         if (flag_animation_run == True):
             for j in range(256 * iterations):
                 for i in range(strip.numPixels()):
+                    print("Animacja tęnczy")
                     strip.setPixelColor(i, wheel((int(i * 256 / strip.numPixels()) + j) & 255))
                 strip.show()
                 time.sleep(wait_ms / 1000.0)
@@ -193,7 +196,7 @@ def rainbowCycle(strip, wait_ms=20, iterations=1):
             
 def theaterChaseRainbow(strip, wait_ms=50):
     """Rainbow movie theater light style chaser animation."""
-    my_gui.changeBrightness()
+    #my_gui.changeBrightness()
     for j in range(256):
         for q in range(3):
             for i in range(0, strip.numPixels(), 3):
