@@ -11,19 +11,18 @@ class Animation:
         self.__class__.flag_animation_run = False
         self.__class__.flag_animation_stop = False
 
-    # Set flags to stop animation
     @classmethod
-    def stop_animation(self):
+    def stop_animation(cls):
         """Set flag to stop animation."""
-        Animation.flag_animation_stop = True
-        Animation.flag_animation_run = False
+        cls.flag_animation_stop = True
+        cls.flag_animation_run = False
 
-    # Set flags to start animation
     @classmethod
-    def start_animation(self):
+    def start_animation(cls):
         """Set flag to run animation."""
-        Animation.flag_animation_stop = False
-        Animation.flag_animation_run = True
+        cls.flag_animation_stop = False
+        cls.flag_animation_run = True
+        cls.flag_thread = True
 
     @staticmethod
     def color_wipe(strip, color, wait_ms=50):
