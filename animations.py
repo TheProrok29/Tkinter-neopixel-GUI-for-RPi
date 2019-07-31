@@ -100,3 +100,28 @@ class Animation:
                 time.sleep(wait_ms / 1000.0)
                 for i in range(0, strip.numPixels(), 3):
                     strip.setPixelColor(i + q, 0)
+
+    @staticmethod
+    def point(strip, color, wait_ms=50):
+        """Rainbow movie theater light style chaser animation."""
+        a = strip.numPixels()
+        while (True):
+            if (Animation.flag_animation_stop == True):
+                    Animation.color_wipe(strip, Color(0, 0, 0))
+                    return
+            if (Animation.flag_animation_run == True):
+                for i in range(strip.numPixels()):
+                    print(i)
+                    time.sleep(1/2)
+                    strip.setPixelColor(i-1, Color(0,0,0))
+                    strip.setPixelColor(i, color)
+                    strip.setPixelColor(i, color)
+                    strip.setPixelColor(i, color)
+                for i in range(strip.numPixels(), 0, -1):
+                    print(i)
+                    time.sleep(1/2)
+                    strip.setPixelColor(i+1, Color(0,0,0))
+                    strip.setPixelColor(i, color)
+                    strip.setPixelColor(i, color)
+                    strip.setPixelColor(i, color)
+                

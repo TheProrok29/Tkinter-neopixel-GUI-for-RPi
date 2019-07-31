@@ -56,6 +56,7 @@ class GraphicalUserInterface(Frame):
         self.listBox = Listbox(master, selectmode=SINGLE, height=4)
         self.listBox.insert(1, "Efekt tęczy")
         self.listBox.insert(2, "Efekt tęczy prosty")
+        self.listBox.insert(3, "Efekt point")
         self.listBox.bind('<<ListboxSelect>>', self.onselect)
 
         # Layout
@@ -116,6 +117,10 @@ class GraphicalUserInterface(Frame):
         elif animation == 1:
             Animation.start_animation()
             Animation.rainbow(strip)
+        elif animation == 2:
+            self.btnColor['state'] = 'normal'
+            Animation.start_animation()
+            Animation.point(strip, Color(self.r, self.g, self.b))
         else:
             return
 
