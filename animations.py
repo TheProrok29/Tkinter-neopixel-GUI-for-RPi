@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+
 from neopixel import Color
 
 
@@ -28,7 +29,7 @@ class Animation:
     def color_wipe(strip, color, wait_ms=50):
         """Wipe color across display a pixel at a time."""
         for i in range(strip.numPixels()):
-            #print("Czyszczenie paska")
+            # print("Czyszczenie paska")
             strip.setPixelColor(i, color)
             strip.show()
             time.sleep(wait_ms / 1000.0)
@@ -67,7 +68,7 @@ class Animation:
             if (Animation.flag_animation_run == True):
                 for j in range(256 * iterations):
                     for i in range(strip.numPixels()):
-                        #print("Animacja prostej tęczy")
+                        # print("Animacja prostej tęczy")
                         strip.setPixelColor(i, Animation.wheel((i + j) & 255))
                     strip.show()
                     time.sleep(wait_ms / 1000.0)

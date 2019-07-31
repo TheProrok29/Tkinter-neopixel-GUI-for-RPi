@@ -1,33 +1,13 @@
 # -*- coding: utf-8 -*-
-from neopixel import Adafruit_NeoPixel
-from neopixel import Color
-from animations import Animation
-import tkMessageBox as mb
-
-from Tkinter import *
-from tkColorChooser import askcolor
 from threading import Thread
 
-# LED strip configuration:
-# //////////////////////////////////////////////////////////////////////////
+import tkMessageBox as mb
+from Tkinter import *
+from neopixel import Color
+from tkColorChooser import askcolor
 
-LED_COUNT = 28  # Number of LED pixels.
-LED_PIN = 18  # GPIO pin connected to the pixels (18 uses PWM!).
-# LED_PIN        = 10      # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
-LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA = 10  # DMA channel to use for generating signal (try 10)
-LED_BRIGHTNESS = 128  # Set to 0 for darkest and 255 for brightest
-# True to invert the signal (when using NPN transistor level shift)
-LED_INVERT = False
-LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
-
-# Create NeoPixel object with appropriate configuration.
-strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ,
-                          LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
-
-# Intialize the library (must be called once before other functions).
-strip.begin()
-# ////////////////////////////////////////////////////////////////////////
+from animations import Animation
+from strip_config import strip
 
 
 class GraphicalUserInterface(Frame):
@@ -48,7 +28,7 @@ class GraphicalUserInterface(Frame):
         self.shine = 0  # Brightness
 
         self.work_status = None  # Thread work status
-        self.effect = None
+        self.effect = None  # Active animation effect from listBox
 
         # Widgets
         # ///////////////////////////////////////////////////////////////////
@@ -144,7 +124,7 @@ class GraphicalUserInterface(Frame):
         self.shine = self.scale.get()
         strip.setBrightness(self.shine)
         strip.show()
-        #print("Ustawienie podświetlenia")
+        # print("Ustawienie podświetlenia")
 
     def get_color(self):
         """Get colour using tkinter color chooser."""
@@ -159,7 +139,7 @@ class GraphicalUserInterface(Frame):
     def off_leds(self):
         """Power off leds."""
         Animation.color_wipe(strip, Color(0, 0, 0))
-        #print("Wyłączenie ledów")
+        # print("Wyłączenie ledów")
 
 
 if __name__ == '__main__':
