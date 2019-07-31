@@ -104,23 +104,20 @@ class GraphicalUserInterface(Frame):
 
     def init_thread(self):
         """Initialize new thread with right task"""
-        work = self.effect
-        if work == 0:
-            self.work_status = Thread(target=self.start_rainbow)
-            self.work_status.start()
-            self.check_thread(self.work_status, work)
-        elif work == 1:
-            self.work_status = Thread(target=self.start_rainbow_all)
-            self.work_status.start()
-            self.check_thread(self.work_status, work)
-        else:
-            return
-       
+        animation = self.effect
+        # print(animation)
+        self.work_status = Thread(
+            target=self.start_animations_effect, args=(animation,))
+        self.work_status.start()
+        self.check_thread(self.work_status, animation)
+
     def check_thread(self, pass_thread, thread_name):
         """Check that some thread is active, if not enable all buttons"""
         if pass_thread.isAlive() == False:
             pass_thread = None
             self.btnEffectOn['state'] = 'normal'
+            self.btnColor['state'] = 'normal'
+            self.btnOff['state'] = 'normal'
             effectName = self.listBox.get(thread_name)
             effectName = effectName.encode("utf-8")
             mb.showinfo("Komunikat", "{} - zakończone".format(effectName))
@@ -128,24 +125,26 @@ class GraphicalUserInterface(Frame):
             self.after(1000, lambda: self.check_thread(
                 pass_thread, thread_name))
 
-    def start_rainbow(self):
-        """Run rainbow animation on separate thread."""
+    def start_animations_effect(self, animation):
+        """Run correct animation on separate thread."""
         self.btnEffectOn['state'] = 'disabled'
-        Animation.start_animation()
-        Animation.rainbow_cycle(strip)
-
-    def start_rainbow_all(self):
-        """Run rainbow animation on separate thread, all pixels at once."""
-        self.btnEffectOn['state'] = 'disabled'
-        Animation.start_animation()
-        Animation.rainbow(strip)
+        self.btnColor['state'] = 'disabled'
+        self.btnOff['state'] = 'disabled'
+        if animation == 0:
+            Animation.start_animation()
+            Animation.rainbow_cycle(strip)
+        elif animation == 1:
+            Animation.start_animation()
+            Animation.rainbow(strip)
+        else:
+            return
 
     def change_brightness(self):
         """Change pixel shine between 0-min and 255-max"""
         self.shine = self.scale.get()
         strip.setBrightness(self.shine)
         strip.show()
-        # print("Ustawienie podświetlenia")
+        #print("Ustawienie podświetlenia")
 
     def get_color(self):
         """Get colour using tkinter color chooser."""
@@ -160,7 +159,7 @@ class GraphicalUserInterface(Frame):
     def off_leds(self):
         """Power off leds."""
         Animation.color_wipe(strip, Color(0, 0, 0))
-        # print("Wyłączenie ledów")
+        #print("Wyłączenie ledów")
 
 
 if __name__ == '__main__':
