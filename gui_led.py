@@ -36,7 +36,7 @@ class GraphicalUserInterface(Frame):
         Frame.__init__(self, master)
         self.master = master
         master.title('LED WS2812 options')
-        master.geometry('500x180')
+        master.geometry('520x220')
         master.resizable(width=False, height=False)
 
         # Variables
@@ -48,12 +48,13 @@ class GraphicalUserInterface(Frame):
         self.shine = 0  # Brightness
 
         self.work_status = None  # Thread work status
+        self.effect = None
 
         # Widgets
         # ///////////////////////////////////////////////////////////////////
 
         self.labelColor = Label(master, text="Wybierz kolor podświetlenia: ")
-        self.labelRainbow = Label(master, text="Efekt tęczy")
+        self.labelEffect = Label(master, text="Wybierz efekt")
         self.labelBrightness = Label(
             master, text="Ustaw intensywność podświetlenia: ")
         self.labelOff = Label(master, text="Kliknij jeśli chcesz wyłączyć: ")
@@ -61,13 +62,9 @@ class GraphicalUserInterface(Frame):
 
         self.btnColor = Button(
             master, text="Paleta kolorów:", command=self.get_color)
-        self.btnRainbowOn = Button(
-            master, text="     Włącz     ", command=lambda: self.init_thread("Efekt tęczy"))
-        self.btnRainbowOff = Button(
-            master, text="Wyłącz", command=Animation.stop_animation)
-        self.btnRainbowAllOn = Button(
-            master, text="    Włącz    ", command=lambda: self.init_thread("Efekt tęczy prosty"))
-        self.btnRainbowOff2 = Button(
+        self.btnEffectOn = Button(
+            master, text="     Włącz     ", command=self.init_thread)
+        self.btnEffectOff = Button(
             master, text="Wyłącz", command=Animation.stop_animation)
         self.btnBrightness = Button(
             master, text="Ustaw", command=self.change_brightness)
@@ -76,58 +73,70 @@ class GraphicalUserInterface(Frame):
         self.scale = Scale(master, orient=HORIZONTAL, from_=0, to=255)
         self.scale.set(128)
 
+        self.listBox = Listbox(master, selectmode=SINGLE, height=4)
+        self.listBox.insert(1, "Efekt tęczy")
+        self.listBox.insert(2, "Efekt tęczy prosty")
+        self.listBox.bind('<<ListboxSelect>>', self.onselect)
+
         # Layout
         # ///////////////////////////////////////////////////
 
-        self.labelColor.grid(column=0, row=0, sticky='w')
-        self.labelRainbow.grid(column=0, row=1, sticky='w')
-        self.labelRainbowAll.grid(column=0, row=2, sticky='w')
-        self.labelBrightness.grid(column=0, row=3, sticky='w')
+        self.labelEffect.grid(column=0, row=0, sticky='w')
+        self.labelBrightness.grid(column=0, row=2, sticky='w')
+        self.labelColor.grid(column=0, row=3, sticky='w')
         self.labelOff.grid(column=0, row=4, sticky='w')
 
-        self.btnColor.grid(column=2, row=0, sticky='e')
-        self.btnRainbowOn.grid(column=1, row=1, sticky='we')
-        self.btnRainbowOff.grid(column=2, row=1, sticky='we')
-        self.btnRainbowAllOn.grid(column=1, row=2, sticky='we')
-        self.btnRainbowOff2.grid(column=2, row=2, sticky='we')
-        self.btnBrightness.grid(column=1, row=3, sticky='we')
-        self.btnOff.grid(column=2, row=4, sticky='we')
+        self.btnEffectOn.grid(column=1, row=1, sticky='we')
+        self.btnEffectOff.grid(column=2, row=0, sticky='we')
+        self.btnBrightness.grid(column=2, row=2, sticky='we')
+        self.btnColor.grid(column=1, row=3, sticky='we')
+        self.btnOff.grid(column=1, row=4, sticky='we')
 
-        self.scale.grid(column=2, row=3, sticky='we')
+        self.scale.grid(column=1, row=2, sticky='we')
 
-    def init_thread(self, work):
+        self.listBox.grid(column=1, row=0)
+
+    def onselect(self, event):
+        """Get selected item index from listBox"""
+        w = event.widget
+        idx = int(w.curselection()[0])
+        self.effect = idx
+
+    def init_thread(self):
         """Initialize new thread with right task"""
-        if work == "Efekt tęczy":
+        work = self.effect
+        if work == 0:
             self.work_status = Thread(target=self.start_rainbow)
             self.work_status.start()
             self.check_thread(self.work_status, work)
-        else:
+        elif work == 1:
             self.work_status = Thread(target=self.start_rainbow_all)
             self.work_status.start()
             self.check_thread(self.work_status, work)
-
+        else:
+            return
+       
     def check_thread(self, pass_thread, thread_name):
         """Check that some thread is active, if not enable all buttons"""
         if pass_thread.isAlive() == False:
             pass_thread = None
-            self.btnRainbowAllOn['state'] = 'normal'
-            self.btnRainbowOn['state'] = 'normal'
-            mb.showinfo("Komunikat", "{} - zakończone".format(thread_name))
+            self.btnEffectOn['state'] = 'normal'
+            effectName = self.listBox.get(thread_name)
+            effectName = effectName.encode("utf-8")
+            mb.showinfo("Komunikat", "{} - zakończone".format(effectName))
         else:
             self.after(1000, lambda: self.check_thread(
                 pass_thread, thread_name))
 
     def start_rainbow(self):
         """Run rainbow animation on separate thread."""
-        print('Work 1 started')
-        self.btnRainbowAllOn['state'] = 'disabled'
+        self.btnEffectOn['state'] = 'disabled'
         Animation.start_animation()
         Animation.rainbow_cycle(strip)
 
     def start_rainbow_all(self):
         """Run rainbow animation on separate thread, all pixels at once."""
-        print('Work 2 Started')
-        self.btnRainbowOn['state'] = 'disabled'
+        self.btnEffectOn['state'] = 'disabled'
         Animation.start_animation()
         Animation.rainbow(strip)
 
@@ -136,7 +145,7 @@ class GraphicalUserInterface(Frame):
         self.shine = self.scale.get()
         strip.setBrightness(self.shine)
         strip.show()
-        print("Ustawienie podświetlenia")
+        # print("Ustawienie podświetlenia")
 
     def get_color(self):
         """Get colour using tkinter color chooser."""
@@ -151,7 +160,7 @@ class GraphicalUserInterface(Frame):
     def off_leds(self):
         """Power off leds."""
         Animation.color_wipe(strip, Color(0, 0, 0))
-        print("Wyłączenie ledów")
+        # print("Wyłączenie ledów")
 
 
 if __name__ == '__main__':
