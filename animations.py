@@ -156,3 +156,23 @@ class Animation:
                     strip.setPixelColor(i-1, Color(r, g, b))
                     strip.setPixelColor(i-2, Color(r, g, b))
                     strip.show()
+
+    @staticmethod
+    def twinkle_random(strip, count):
+        """Random pixels with random colour."""
+        while (True):
+            if (Animation.flag_animation_stop == True):
+                Animation.color_wipe(strip, Color(0, 0, 0))
+                return
+            if (Animation.flag_animation_run == True):
+                for i in range(strip.numPixels()):
+                    print("Czyszczenie paska")
+                    strip.setPixelColor(i, Color(0,0,0))
+                    strip.show()
+    
+                for i in range(count):
+                    a=randint(0,strip.numPixels())
+                    strip.setPixelColor(a ,Color(randint(0,255),randint(0,255),randint(0,255)))
+                    strip.show()
+                    print(a)
+                    time.sleep(0.2)

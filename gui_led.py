@@ -16,7 +16,7 @@ class GraphicalUserInterface(Frame):
         Frame.__init__(self, master)
         self.master = master
         master.title('LED WS2812 options')
-        master.geometry('520x220')
+        master.geometry('540x240')
         master.resizable(width=False, height=False)
 
         # Variables
@@ -55,11 +55,12 @@ class GraphicalUserInterface(Frame):
         self.scale = Scale(master, orient=HORIZONTAL, from_=0, to=255)
         self.scale.set(128)
 
-        self.listBox = Listbox(master, selectmode=SINGLE, height=4)
+        self.listBox = Listbox(master, selectmode=SINGLE, height=5)
         self.listBox.insert(1, "Efekt tęczy")
         self.listBox.insert(2, "Efekt tęczy prosty")
         self.listBox.insert(3, "Efekt point")
         self.listBox.insert(4, "Efekt random point")
+        self.listBox.insert(5, "Efekt random twinkle")
         self.listBox.bind('<<ListboxSelect>>', self.onselect)
 
         # Layout
@@ -128,6 +129,9 @@ class GraphicalUserInterface(Frame):
         elif animation == 3:
             Animation.start_animation()
             Animation.random_color_flowing_point(strip)
+        elif animation == 4:
+            Animation.start_animation()
+            Animation.twinkle_random(strip,10)
         else:
             return
 
