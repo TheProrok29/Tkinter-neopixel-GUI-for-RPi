@@ -59,6 +59,7 @@ class GraphicalUserInterface(Frame):
         self.listBox.insert(1, "Efekt tęczy")
         self.listBox.insert(2, "Efekt tęczy prosty")
         self.listBox.insert(3, "Efekt point")
+        self.listBox.insert(4, "Efekt random point")
         self.listBox.bind('<<ListboxSelect>>', self.onselect)
 
         # Layout
@@ -122,9 +123,11 @@ class GraphicalUserInterface(Frame):
             Animation.start_animation()
             Animation.rainbow(strip)
         elif animation == 2:
-            self.btnGetColor['state'] = 'normal'
             Animation.start_animation()
-            Animation.point(strip, Color(self.r, self.g, self.b))
+            Animation.flowing_point(strip, Color(self.r, self.g, self.b))
+        elif animation == 3:
+            Animation.start_animation()
+            Animation.random_color_flowing_point(strip)
         else:
             return
 

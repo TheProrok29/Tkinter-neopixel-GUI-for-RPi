@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
-
+from random import randint
 from neopixel import Color
 
 
@@ -102,32 +102,57 @@ class Animation:
                     strip.setPixelColor(i + q, 0)
 
     @staticmethod
-    def point(strip, color, wait_ms=50):
-        """Rainbow movie theater light style chaser animation."""
-        a = strip.numPixels()
-        print(color)
+    def flowing_point(strip, color):
+        """Flowing point contains three pixels with given colour."""
         while (True):
-            
             if (Animation.flag_animation_stop == True):
-                    Animation.color_wipe(strip, Color(0, 0, 0))
-                    return
+                Animation.color_wipe(strip, Color(0, 0, 0))
+                return
             if (Animation.flag_animation_run == True):
                 for i in range(strip.numPixels()):
-                    #print(i)
-                    time.sleep(1/2)
-                    strip.setPixelColor(i-1, Color(0,0,0))
+                    # print(i)
+                    time.sleep(0.2)
+                    strip.setPixelColor(i-1, Color(0, 0, 0))
                     strip.setPixelColor(i, color)
                     strip.setPixelColor(i+1, color)
                     strip.setPixelColor(i+2, color)
-                    print(color)
                     strip.show()
-                for i in range(strip.numPixels(), 0, -1):
-                    #print(i)
-                    time.sleep(1/2)
-                    strip.setPixelColor(i+1, Color(0,0,0))
+                for i in range(strip.numPixels(), -1, -1):
+                    # print(i)
+                    time.sleep(0.2)
+                    strip.setPixelColor(i+1, Color(0, 0, 0))
                     strip.setPixelColor(i, color)
                     strip.setPixelColor(i-1, color)
                     strip.setPixelColor(i-2, color)
                     strip.show()
-                    print(color)
-                
+
+    @staticmethod
+    def random_color_flowing_point(strip):
+        """Flowing point contains three pixels with random colour."""
+        while (True):
+            if (Animation.flag_animation_stop == True):
+                Animation.color_wipe(strip, Color(0, 0, 0))
+                return
+            if (Animation.flag_animation_run == True):
+                r = randint(0, 255)
+                g = randint(0, 255)
+                b = randint(0, 255)
+                print(r)
+                print(g)
+                print(b)
+                for i in range(strip.numPixels()):
+                    # print(i)
+                    time.sleep(0.2)
+                    strip.setPixelColor(i-1, Color(0, 0, 0))
+                    strip.setPixelColor(i, Color(r, g, b))
+                    strip.setPixelColor(i+1, Color(r, g, b))
+                    strip.setPixelColor(i+2, Color(r, g, b))
+                    strip.show()
+                for i in range(strip.numPixels(), -1, -1):
+                    # print(i)
+                    time.sleep(0.2)
+                    strip.setPixelColor(i+1, Color(0, 0, 0))
+                    strip.setPixelColor(i, Color(r, g, b))
+                    strip.setPixelColor(i-1, Color(r, g, b))
+                    strip.setPixelColor(i-2, Color(r, g, b))
+                    strip.show()
